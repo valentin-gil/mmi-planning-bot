@@ -308,7 +308,6 @@ async function checkForChanges() {
         const events = await fetchEvents([url]);
         if (!events || events.length === 0) {
           console.warn(`[ICS] Planning inaccessible ou vide pour ${group.nom} (${url}) : aucune comparaison, aucun message envoyé.`);
-          // On ne touche pas à lastEventsByGroup[key] pour éviter les faux positifs
           continue;
         }
         const lastEvents = lastEventsByGroup[key] || [];
@@ -395,6 +394,7 @@ client.on("interactionCreate", async (interaction) => {
       });
 
     if (id === "roles_toggle_mention") {
+      const db = require("./src/db");
       const group = findUserGroupFromRoles(member);
       if (!group)
         return interaction.reply({
@@ -420,15 +420,8 @@ client.on("interactionCreate", async (interaction) => {
           await member.roles.add(role);
         }
         const userId = member.id;
-        if (!subscriptions[userId])
-          subscriptions[userId] = { group: group.nom, mention: !has, dm: true };
-        else {
-          subscriptions[userId].group = group.nom;
-          subscriptions[userId].mention = !has;
-          if (typeof subscriptions[userId].dm === "undefined")
-            subscriptions[userId].dm = true;
-        }
-        fs.writeFileSync(SUB_FILE, JSON.stringify(subscriptions, null, 2));
+        const sub = await db.getSubscription(userId);
+        await db.saveSubscription(userId, group.nom, !has, sub ? sub.dm : true);
         return interaction.reply({
           content: has
             ? `Tu ne seras plus mentionné lors des changements d'emploi du temps.`
@@ -445,6 +438,7 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (id === "roles_toggle_dm") {
+      const db = require("./src/db");
       const group = findUserGroupFromRoles(member);
       if (!group)
         return interaction.reply({
@@ -454,16 +448,10 @@ client.on("interactionCreate", async (interaction) => {
         });
       try {
         const userId = member.id;
-        if (!subscriptions[userId])
-          subscriptions[userId] = {
-            group: group.nom,
-            mention: false,
-            dm: true,
-          };
-        subscriptions[userId].dm = !subscriptions[userId].dm;
-        fs.writeFileSync(SUB_FILE, JSON.stringify(subscriptions, null, 2));
+        const sub = await db.getSubscription(userId);
+        await db.saveSubscription(userId, group.nom, sub ? sub.mention : false, sub ? !sub.dm : true);
         return interaction.reply({
-          content: subscriptions[userId].dm
+          content: sub && !sub.dm
             ? "Tu recevras désormais des MP lors des changements d'emploi du temps."
             : "Tu ne recevras plus de MP lors des changements d'emploi du temps.",
           ephemeral: true,

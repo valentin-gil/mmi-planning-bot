@@ -1,6 +1,7 @@
 const { ApplicationCommandOptionType } = require("discord.js");
 const groups = require("../groups");
 const { DEV_GUILD_ID } = require("./config");
+const db = require("./db");
 
 function getGlobalCommands() {
   return [
@@ -74,7 +75,7 @@ async function handleSlashCommand(
 ) {
   if (interaction.commandName === "mes-options") {
     const userId = interaction.user.id;
-    const sub = subscriptions[userId];
+    const sub = await db.getSubscription(userId);
     if (!sub) {
       return interaction.reply({
         content: "Tu n'as pas d'options enregistrées.",
@@ -82,9 +83,9 @@ async function handleSlashCommand(
       });
     }
     return interaction.reply({
-      content: `Options: groupe **${sub.group}**\nMention via rôle: **${
+      content: `Options: groupe **${sub.group_name}**\nMention via rôle: **${
         sub.mention ? "oui" : "non"
-      }**\nMP: **${wantsDM(sub) ? "oui" : "non"}**`,
+      }**\nMP: **${sub.dm ? "oui" : "non"}**`,
       ephemeral: true,
     });
   }

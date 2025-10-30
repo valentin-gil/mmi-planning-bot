@@ -135,8 +135,6 @@ function buildChangeEmbed(type, oldEvt, newEvt, groupName, groupUrl) {
     return formatTime(newDateStr || oldDateStr);
   };
 
-  // Helper pour générer le lien vers l'emploi du temps
-  // Utilise le même format que le rôle (ex: *CC2:4)
   function getGroupParam(nom) {
     const yearMatch = nom.match(/(\d+)/);
     const tpMatch = nom.match(/TP\s*(\d+)/i) || nom.match(/TP(\d+)/i);
@@ -420,23 +418,22 @@ async function sendEmbedToChannels(client, embed, roleName, ROLE_CHANNEL_MAP) {
   return posted;
 }
 
+const db = require("./db");
 async function sendEmbedDMs(
   client,
   embed,
   userIds,
-  subscriptions,
+  _subscriptions,
   groupName,
-  wantsDM
+  _wantsDM
 ) {
-  // Utilise la normalisation pour matcher les groupes (casse/accents)
   const { normalizeForMatch } = require("./roles");
   for (const userId of userIds) {
-    const sub = subscriptions[userId];
-    const normSubGroup = sub ? normalizeForMatch(sub.group) : null;
-    const normGroupName = normalizeForMatch(groupName);
-    const dmWanted = sub ? wantsDM(sub) : false;
-    if (sub && normSubGroup === normGroupName && dmWanted) {
-      try {
+    try {
+      const sub = await db.getSubscription(userId);
+      const normSubGroup = sub ? normalizeForMatch(sub.group_name) : null;
+      const normGroupName = normalizeForMatch(groupName);
+      if (sub && normSubGroup === normGroupName && sub.dm) {
         const user = await client.users.fetch(userId).catch(() => null);
         if (user) {
           await user
@@ -445,9 +442,9 @@ async function sendEmbedDMs(
               console.error(`Impossible d'envoyer le DM à ${userId}:`, err)
             );
         }
-      } catch (err) {
-        console.error(`Erreur lors de l'envoi du DM à ${userId}:`, err);
       }
+    } catch (err) {
+      console.error(`Erreur lors de l'envoi du DM à ${userId}:`, err);
     }
   }
 }
