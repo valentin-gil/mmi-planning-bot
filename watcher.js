@@ -743,7 +743,7 @@ client.once("clientReady", async () => {
           `**Ne manque plus aucun changement de cours !**\n\n` +
             `Toutes les modifications de l'emploi du temps sont détectées et envoyées dans le salon #changement-cours.\n\n` +
             `Tu peux consulter ton emploi du temps à tout moment sur : [mmi-planning.vgil.fr](https://mmi-planning.vgil.fr)\n\n` +
-            `Pour être sûr de ne rien manquer, tu peux activer une ou plusieurs des options ci-dessous :`
+            `Pour être sûr de ne rien manquer, tu peux activer une ou plusieurs des options ci-dessous.`
         )
         .addFields(
           {
