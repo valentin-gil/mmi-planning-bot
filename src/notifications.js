@@ -148,7 +148,7 @@ function buildChangeEmbed(type, oldEvt, newEvt, groupName, groupUrl) {
     const d = new Date(evt.start);
     const jan4 = new Date(d.getFullYear(), 0, 4);
     const dayOfYear = (d - new Date(d.getFullYear(), 0, 1)) / 86400000 + 1;
-    const week = Math.ceil((dayOfYear + jan4.getDay() - 1) / 7);
+    const week = Math.ceil((dayOfYear + jan4.getDay() - 1) / 7) - 1;
     return week;
   }
   function getClassParam(evt) {
