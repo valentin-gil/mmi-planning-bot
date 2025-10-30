@@ -23,6 +23,14 @@ function normalizeForMatch(s) {
 function findUserGroupFromRoles(member) {
   if (!member || !member.roles) return null;
   const roleNames = member.roles.cache.map((r) => normalizeForMatch(r.name));
+  // Cherche d'abord une correspondance exacte
+  for (const group of groups) {
+    const gNorm = normalizeForMatch(group.nom);
+    if (roleNames.includes(gNorm)) {
+      return group;
+    }
+  }
+  // Sinon, cherche une inclusion (fallback)
   for (const group of groups) {
     const gNorm = normalizeForMatch(group.nom);
     if (roleNames.some((rn) => rn.includes(gNorm) || gNorm.includes(rn))) {
