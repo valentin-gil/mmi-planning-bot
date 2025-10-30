@@ -306,6 +306,11 @@ async function checkForChanges() {
       const key = `${group.nom}::${url}`;
       try {
         const events = await fetchEvents([url]);
+        if (!events || events.length === 0) {
+          console.warn(`[ICS] Planning inaccessible ou vide pour ${group.nom} (${url}) : aucune comparaison, aucun message envoyé.`);
+          // On ne touche pas à lastEventsByGroup[key] pour éviter les faux positifs
+          continue;
+        }
         const lastEvents = lastEventsByGroup[key] || [];
         const { added, removed, modified, locationChanged } = compareEvents(
           lastEvents,
@@ -318,7 +323,6 @@ async function checkForChanges() {
           locationChanged.length;
         if (anyChanges > 0) {
           const roleName = roleNameFromGroupNom(group.nom);
-          const mappedChannelId = ROLE_CHANNEL_MAP[roleName];
 
           const sendChange = async (changeType, oldEvt, newEvt) => {
             const sourceEvt = newEvt || oldEvt;
