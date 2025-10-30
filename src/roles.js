@@ -42,6 +42,7 @@ async function ensureRolesInGuild(guild) {
           name: roleName,
           color: "#36393F",
           mentionable: true,
+          permissions: 0,
         });
         console.log(`Created role ${roleName} in guild ${guild.id}`);
       } catch (err) {
