@@ -40,7 +40,9 @@ const {
 } = require("./src/notifications");
 app.get("/", (req, res) => res.send("OK"));
 app.listen(PORT, () => console.log(`HTTP server listening on port ${PORT}`));
+
 const fs = require("fs");
+const db = require("./src/db");
 require("dotenv").config();
 
 const client = new Client({
@@ -327,7 +329,6 @@ async function checkForChanges() {
               group.nom
             );
             // Utilise la base pour récupérer les userIds abonnés à ce groupe et DM activé
-            const db = require("./src/db");
             const { normalizeForMatch } = require("./src/roles");
             const allSubs = await db.pool.query("SELECT user_id, group_name FROM subscriptions WHERE dm = true");
             const userIds = allSubs.rows
@@ -387,7 +388,6 @@ client.on("interactionCreate", async (interaction) => {
       });
 
     if (id === "roles_toggle_mention") {
-      const db = require("./src/db");
       const group = findUserGroupFromRoles(member);
       if (!group)
         return interaction.reply({
@@ -431,7 +431,6 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (id === "roles_toggle_dm") {
-      const db = require("./src/db");
       const group = findUserGroupFromRoles(member);
       if (!group)
         return interaction.reply({
@@ -465,7 +464,7 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.commandName === "mes-options") {
     const userId = interaction.user.id;
-    const sub = subscriptions[userId];
+    const sub = await db.getSubscription(userId);
     if (!sub) {
       return interaction.reply({
         content: "Tu n'as pas d'options enregistrées.",
@@ -473,9 +472,9 @@ client.on("interactionCreate", async (interaction) => {
       });
     }
     return interaction.reply({
-      content: `Groupe : **${sub.group}**\nMention : **${
+      content: `Groupe : **${sub.group_name}**\nMention : **${
         sub.mention ? "oui" : "non"
-      }**\nMP : **${wantsDM(sub) ? "oui" : "non"}**`,
+      }**\nMP : **${sub.dm ? "oui" : "non"}**`,
       ephemeral: true,
     });
   }
@@ -629,13 +628,19 @@ client.on("interactionCreate", async (interaction) => {
         }
       }
 
+      // Utilise la base pour récupérer les userIds abonnés à ce groupe et DM activé
+      const { normalizeForMatch } = require("./src/roles");
+      const allSubs = await db.pool.query("SELECT user_id, group_name FROM subscriptions WHERE dm = true");
+      const userIds = allSubs.rows
+        .filter(row => normalizeForMatch(row.group_name) === normalizeForMatch(group.nom))
+        .map(row => row.user_id);
       await sendEmbedDMs(
         client,
         embed,
-        Object.keys(subscriptions),
-        subscriptions,
+        userIds,
+        null,
         group.nom,
-        wantsDM
+        null
       );
 
       try {
