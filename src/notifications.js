@@ -358,12 +358,13 @@ function buildChangeEmbed(type, oldEvt, newEvt, groupName, groupUrl) {
       : oldEvt && oldEvt.updatedEpoch
       ? oldEvt.updatedEpoch
       : null;
+  const minusOneHour = (epoch) => new Date((epoch - 3600) * 1000);
   if (lastMod) {
-    embed.setTimestamp(new Date(lastMod * 1000));
+    embed.setTimestamp(minusOneHour(lastMod));
   } else if (explicitUpd) {
-    embed.setTimestamp(new Date(explicitUpd * 1000));
+    embed.setTimestamp(minusOneHour(explicitUpd));
   } else {
-    embed.setTimestamp(new Date());
+    embed.setTimestamp(minusOneHour(Math.floor(Date.now() / 1000)));
   }
   return embed;
 }
