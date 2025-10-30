@@ -1,0 +1,21 @@
+{
+  "name": "mmi-planning-bot",
+  "version": "1.0.0",
+  "description": "Bot discord qui détecte les changements dans l'emploi du temps des MMI de l'IUT d'Angoulême",
+  "main": "watcher.js",
+  "scripts": {
+    "start": "node watcher.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "discord.js": "^14.24.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "ical.js": "^2.2.1",
+    "node-fetch": "^3.3.2"
+  }
+}
