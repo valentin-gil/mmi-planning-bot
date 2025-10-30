@@ -60,21 +60,7 @@ client.on("guildCreate", async (guild) => {
   }
 });
 
-let subscriptions = {};
-const SUB_FILE = "./subscriptions.json";
-
-if (fs.existsSync(SUB_FILE)) {
-  subscriptions = JSON.parse(fs.readFileSync(SUB_FILE));
-}
-for (const userId in subscriptions) {
-  if (typeof subscriptions[userId] === "string") {
-    subscriptions[userId] = {
-      group: subscriptions[userId],
-      mention: false,
-      dm: true,
-    };
-  }
-}
+// Les préférences utilisateurs sont désormais gérées uniquement via la base PostgreSQL (voir src/db.js)
 
 let lastEventsByGroup = {};
 
@@ -340,13 +326,20 @@ async function checkForChanges() {
               grpName,
               group.nom
             );
+            // Utilise la base pour récupérer les userIds abonnés à ce groupe et DM activé
+            const db = require("./src/db");
+            const { normalizeForMatch } = require("./src/roles");
+            const allSubs = await db.pool.query("SELECT user_id, group_name FROM subscriptions WHERE dm = true");
+            const userIds = allSubs.rows
+              .filter(row => normalizeForMatch(row.group_name) === normalizeForMatch(group.nom))
+              .map(row => row.user_id);
             await sendEmbedDMs(
               client,
               embed,
-              Object.keys(subscriptions),
-              subscriptions,
+              userIds,
+              null,
               group.nom,
-              wantsDM
+              null
             );
             await sendEmbedToChannels(
               client,
