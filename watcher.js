@@ -748,7 +748,7 @@ client.once("clientReady", async () => {
         .addFields(
           {
             name: "<:bell:1433107833766805705> Mention",
-            value: "Tu seras notifié dans le salon #\🚨︱changement-cours à chaque fois qu'un changement sera détecté dans l'emploi du temps",
+            value: "Tu seras notifié dans le salon #changement-cours à chaque fois qu'un changement sera détecté dans l'emploi du temps",
             inline: true,
           },
           {
