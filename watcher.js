@@ -69,6 +69,7 @@ let lastEventsByGroup = {};
 async function fetchEvents(urls) {
   const results = await Promise.all(
     urls.map(async (url) => {
+      console.log(`[ICS] Fetching: ${url}`);
       try {
         const res = await fetch(url);
         if (!res.ok) {
@@ -309,6 +310,7 @@ async function checkForChanges() {
           modified.length +
           locationChanged.length;
         if (anyChanges > 0) {
+          console.log(`[ICS] Changement détecté pour ${group.nom} (${url}) : ${anyChanges} changement(s)`);
           const roleName = roleNameFromGroupNom(group.nom);
 
           const sendChange = async (changeType, oldEvt, newEvt) => {
@@ -364,6 +366,8 @@ async function checkForChanges() {
           }
 
           lastEventsByGroup[key] = events;
+        } else {
+          console.log(`[ICS] Aucun changement détecté pour ${group.nom} (${url})`);
         }
       } catch (err) {
         console.error(`Erreur pour le groupe ${group.nom} (${url}):`, err);
