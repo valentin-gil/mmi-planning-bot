@@ -79,14 +79,14 @@ async function handleSlashCommand(
     if (!sub) {
       return interaction.reply({
         content: "Tu n'as pas d'options enregistrées.",
-        ephemeral: true,
+        flags: 64,
       });
     }
     return interaction.reply({
       content: `Options: groupe **${sub.group_name}**\nMention via rôle: **${
         sub.mention ? "oui" : "non"
       }**\nMP: **${sub.dm ? "oui" : "non"}**`,
-      ephemeral: true,
+      flags: 64,
     });
   }
 
@@ -96,7 +96,7 @@ async function handleSlashCommand(
       interaction.options.getString("change_type") || "simulate";
     const sendTo = interaction.options.getString("send_to") || "me";
     try {
-      await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply({ flags: 64 });
     } catch (err) {
       console.error("Failed to defer interaction reply for /simulate:", err);
     }
@@ -197,7 +197,7 @@ async function handleSlashCommand(
       }
       await interaction.editReply({
         content: "Simulation envoyée.",
-        ephemeral: true,
+        flags: 64,
       });
     } catch (err) {
       console.error("Erreur dans /simulate:", err);

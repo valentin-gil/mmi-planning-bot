@@ -382,13 +382,13 @@ client.on("interactionCreate", async (interaction) => {
     if (!interaction.guild)
       return interaction.reply({
         content: "Cette action doit être effectuée depuis un serveur.",
-        ephemeral: true,
+        flags: 64,
       });
     const member = interaction.member;
     if (!member)
       return interaction.reply({
         content: "Impossible de récupérer le membre.",
-        ephemeral: true,
+        flags: 64,
       });
 
     if (id === "roles_toggle_mention") {
@@ -397,7 +397,7 @@ client.on("interactionCreate", async (interaction) => {
         return interaction.reply({
           content:
             "Impossible de déterminer ton groupe depuis tes rôles. Assure-toi d'avoir un rôle correspondant (ex: '2eme année - TP4').",
-          ephemeral: true,
+          flags: 64,
         });
       try {
         await ensureRolesInGuild(interaction.guild);
@@ -408,7 +408,7 @@ client.on("interactionCreate", async (interaction) => {
         if (!role)
           return interaction.reply({
             content: `Le rôle ${roleName} est introuvable et n'a pas pu être créé. Vérifie les permissions du bot.`,
-            ephemeral: true,
+            flags: 64,
           });
         const has = member.roles.cache.has(role.id);
         if (has) {
@@ -423,13 +423,13 @@ client.on("interactionCreate", async (interaction) => {
           content: has
             ? `Tu ne seras plus mentionné lors des changements d'emploi du temps.`
             : `Tu seras désormais mentionné lors des changements d'emploi du temps.`,
-          ephemeral: true,
+          flags: 64,
         });
       } catch (err) {
         console.error("Erreur lors du toggle mention:", err);
         return interaction.reply({
           content: "Erreur lors de la modification de ton rôle (voir logs).",
-          ephemeral: true,
+          flags: 64,
         });
       }
     }
@@ -440,7 +440,7 @@ client.on("interactionCreate", async (interaction) => {
         return interaction.reply({
           content:
             "Impossible de déterminer ton groupe depuis tes rôles. Assure-toi d'avoir un rôle correspondant (ex: '2eme année - TP4').",
-          ephemeral: true,
+          flags: 64,
         });
       try {
         const userId = member.id;
@@ -450,14 +450,14 @@ client.on("interactionCreate", async (interaction) => {
           content: sub && !sub.dm
             ? "Tu recevras désormais des MP lors des changements d'emploi du temps."
             : "Tu ne recevras plus de MP lors des changements d'emploi du temps.",
-          ephemeral: true,
+          flags: 64,
         });
       } catch (err) {
         console.error("Erreur lors du toggle DM:", err);
         return interaction.reply({
           content:
             "Erreur lors de la modification de ta préférence DM (voir logs).",
-          ephemeral: true,
+          flags: 64,
         });
       }
     }
@@ -472,14 +472,14 @@ client.on("interactionCreate", async (interaction) => {
     if (!sub) {
       return interaction.reply({
         content: "Tu n'as pas d'options enregistrées.",
-        ephemeral: true,
+        flags: 64,
       });
     }
     return interaction.reply({
       content: `Groupe : **${sub.group_name}**\nMention : **${
         sub.mention ? "oui" : "non"
       }**\nMP : **${sub.dm ? "oui" : "non"}**`,
-      ephemeral: true,
+      flags: 64,
     });
   }
 
@@ -488,7 +488,7 @@ client.on("interactionCreate", async (interaction) => {
     const changeType =
       interaction.options.getString("change_type") || "simulate";
     try {
-      await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply({ flags: 64 });
     } catch (err) {
       console.error("Failed to defer interaction reply for /simulate:", err);
     }
@@ -650,7 +650,7 @@ client.on("interactionCreate", async (interaction) => {
       try {
         await interaction.editReply({
           content: "Simulation envoyée.",
-          ephemeral: true,
+          flags: 64,
         });
       } catch (e) {}
       return;
@@ -659,7 +659,7 @@ client.on("interactionCreate", async (interaction) => {
       try {
         await interaction.editReply({
           content: "Erreur lors de la simulation (voir console).",
-          ephemeral: true,
+          flags: 64,
         });
       } catch (e) {}
       return;

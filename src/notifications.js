@@ -143,14 +143,13 @@ function buildChangeEmbed(type, oldEvt, newEvt, groupName, groupUrl) {
     const groupNum = tpMatch ? tpMatch[1] : nums[1] || nums[0] || "0";
     return `${year}:${groupNum}`;
   }
-  function getWeekParam(evt) {
-    if (!evt || !evt.start) return "";
-    const d = new Date(evt.start);
-    const jan4 = new Date(d.getFullYear(), 0, 4);
-    const dayOfYear = (d - new Date(d.getFullYear(), 0, 1)) / 86400000 + 1;
-    const week = Math.ceil((dayOfYear + jan4.getDay() - 1) / 7);
-    return week;
-  }
+    function getWeekParam(evt) {
+      if (!evt || !evt.start) return "";
+      const d = new Date(evt.start);
+      const startOfYear = new Date(d.getFullYear(), 0, 1);
+      const dayOfYear = Math.floor((d - startOfYear) / 86400000) + 1;
+      return Math.ceil(dayOfYear / 7);
+    }
   function getClassParam(evt) {
     return evt && evt.uid ? encodeURIComponent(evt.uid) : "";
   }
