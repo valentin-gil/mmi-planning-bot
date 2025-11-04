@@ -146,9 +146,19 @@ function buildChangeEmbed(type, oldEvt, newEvt, groupName, groupUrl) {
     function getWeekParam(evt) {
       if (!evt || !evt.start) return "";
       const d = new Date(evt.start);
-      const startOfYear = new Date(d.getFullYear(), 0, 1);
-      const dayOfYear = Math.floor((d - startOfYear) / 86400000) + 1;
-      return Math.ceil(dayOfYear / 7);
+      const year = d.getFullYear();
+      const jan1 = new Date(year, 0, 1);
+      // Premier lundi après le 1er janvier
+      let firstMonday = new Date(jan1);
+      while (firstMonday.getDay() !== 1) {
+        firstMonday.setDate(firstMonday.getDate() + 1);
+      }
+      if (d < firstMonday) {
+        return 1;
+      }
+      // Calcul du numéro de semaine à partir du premier lundi
+      const daysSinceFirstMonday = Math.floor((d - firstMonday) / 86400000);
+      return 2 + Math.floor(daysSinceFirstMonday / 7);
     }
   function getClassParam(evt) {
     return evt && evt.uid ? encodeURIComponent(evt.uid) : "";
